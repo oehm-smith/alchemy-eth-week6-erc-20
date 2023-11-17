@@ -15,13 +15,28 @@ describe("Token", () => {
         a1 = accounts[1];
         s1 = ethers.provider.getSigner(a1);
     });
+
     describe('ERC20 Standard', () => {
         context('transfer', () => {
             describe('the owner transfers a value of 1 to the recipient', () => {
+                let receipt;
                 beforeEach(async () => {
-                    await token.connect(ownerSigner).transfer(a1, "1");
+                    const tx = await token.connect(ownerSigner).transfer(a1, "1");
+                    receipt = await tx.wait();
                 });
+
                 describe('first transfer', async () => {
+                    it('should emit the event', () => {
+                        const transferEvent = receipt.events.find(x => x.event === "Transfer");
+                        assert(transferEvent, "Expect an event named Transfer to be emitted!");
+                        const sender = transferEvent.args[0];
+                        const recipient = transferEvent.args[1];
+                        const amount = transferEvent.args[2];
+                        assert.equal(sender, owner, "Expected the sender address to be the first argument in Transfer");
+                        assert.equal(recipient, a1, "Expected the recipient address to be the second argument in Transfer");
+                        assert.equal(amount.toString(), "1", "Expected the transfer amount to be the third argument in Transfer");
+                    });
+
                     it('should decrease the owner\'s balance by 1', async () => {
                         const balance = await token.callStatic.balanceOf(owner);
                         assert.equal(
@@ -38,7 +53,19 @@ describe("Token", () => {
 
                 describe('second transfer', async () => {
                     beforeEach(async () => {
-                        await token.connect(ownerSigner).transfer(a1, "1");
+                        const tx = await token.connect(ownerSigner).transfer(a1, "1");
+                        receipt = await tx.wait();
+                    });
+
+                    it('should emit the event', () => {
+                        const transferEvent = receipt.events.find(x => x.event === "Transfer");
+                        assert(transferEvent, "Expect an event named Transfer to be emitted!");
+                        const sender = transferEvent.args[0];
+                        const recipient = transferEvent.args[1];
+                        const amount = transferEvent.args[2];
+                        assert.equal(sender, owner, "Expected the sender address to be the first argument in Transfer");
+                        assert.equal(recipient, a1, "Expected the recipient address to be the second argument in Transfer");
+                        assert.equal(amount.toString(), "1", "Expected the transfer amount to be the third argument in Transfer");
                     });
 
                     it('should decrease the owner\'s balance by 1', async () => {

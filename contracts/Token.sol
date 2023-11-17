@@ -21,6 +21,9 @@ contract Token {
     function transfer(address _a, uint _amount) external returns(bool) {
         balance[msg.sender] -= _amount;
         balance[_a] += _amount;
+        emit Transfer(msg.sender, _a, _amount);
         return true;
     }
+
+    event Transfer(address _sender, address _receiver, uint256 _amount);
 }
