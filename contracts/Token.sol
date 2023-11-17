@@ -17,4 +17,10 @@ contract Token {
     function balanceOf(address _a) external view returns (uint256) {
         return balance[_a];
     }
+
+    function transfer(address _a, uint _amount) external returns(bool) {
+        balance[msg.sender] -= _amount;
+        balance[_a] += _amount;
+        return true;
+    }
 }
